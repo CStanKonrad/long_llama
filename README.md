@@ -126,7 +126,13 @@ We manage to achieve good performance on the passkey retrieval task. The code fo
 
 Our model shows also improvements when using long context on two downstream tasks, TREC question classification and WebQS question answering. 
 
-**put the table**
+| Dataset | TREC  | WebQS |
+| --- | --- | --- | --- | --- |
+| | | LongLLaMA 3B | LongLLaMA 3B |
+| $2K$ | | 67.0 |  21.2 |
+| $4K$ | | 71.6 | 21.4 |
+| $6K$ | | 72.9 | 22.2 |
+| $8K$ | | **73.3** | **22.4** |
 
 
 LongLLama retains performance on tasks that do not require long context. We provide a comparison with OpenLLaMA
