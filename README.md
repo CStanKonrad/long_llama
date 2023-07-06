@@ -2,8 +2,11 @@
 <p align="center" width="100%"><img src="assets/longllama.png" alt="LongLLaMA" style="width: 50%;  display: block; margin: auto;"></p>
 
 # LongLLaMA: Focused Transformer Training for Context Scaling
+<div align="center">
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb)
+
+</div>
 
  [TLDR](#TLDR) | [Overview](#Overview) | [Usage](#Usage) | [LongLLaMA performance](#LongLLaMA-performance) | [Authors](#Authors) | [Citation](#Citation) | [License](License) | [Acknowledgments](#Acknowledgments)
 
