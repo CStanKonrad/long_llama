@@ -19,6 +19,7 @@ generation_output = model.generate(
     num_beams=1,
     last_context_length=1792,
     do_sample=True,
-    temperature=1.0,
+    temperature=0.95,
+    top_p=0.9,
 )
 print(tokenizer.decode(generation_output[0]))
