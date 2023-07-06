@@ -1,10 +1,10 @@
 
-<p align="center" width="100%"><img src="assets/longllama.png" alt="LongLLaMA" style="width: 10%; min-width: 300px; display: block; margin: auto;"></p>
+<p align="center" width="100%"><img src="assets/longllama.png" alt="LongLLaMA" style="width: 50%;  display: block; margin: auto;"></p>
 
 # LongLLaMA: Focused Transformer Training for Context Scaling
 
 
-[TLDR](#TLDR) | [Overview](#Overview) | [Usage](#Usage) | [LongLLaMA performance](#LongLLaMA-performance) | [Authors](#Authors) | [Citation](#Citation) | [License](License)
+[Colab](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb) | [TLDR](#TLDR) | [Overview](#Overview) | [Usage](#Usage) | [LongLLaMA performance](#LongLLaMA-performance) | [Authors](#Authors) | [Citation](#Citation) | [License](License)
 
 ## TLDR
 This repository contains the inference code and a checkpoint of **LongLLaMA**. LongLLaMA is a large language model capable of handling long contexts, it is based on [OpenLLaMA](https://github.com/openlm-research/open_llama) and finetuned with the **FoT** method.
@@ -32,7 +32,7 @@ with three layers used for context extension. Crucially, LongLLama is able to ex
 
 ## Usage
 
-See also: [colab with an example usage of LongLLaMA](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.py).
+See also: [colab with an example usage of LongLLaMA](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb).
 ### Requirements
 ```
 pip3 install transformers==4.30 sentencepiece accelerate numpy torch
@@ -121,7 +121,7 @@ We present some illustrative examples of LongLLaMA results and refer to our pape
 We manage to achieve good performance on the passkey retrieval task. The code for generating the prompt and running the model is located in `examples/passkey.py`. 
 
 <p align="center" width="100%">
-<img src="assets/plot_passkey.png" alt="LongLLaMA" style="width: 50%; min-width: 300px; display: block; margin: auto;">
+<img src="assets/plot_passkey.png" alt="LongLLaMA" style="width: 70%; min-width: 300px; display: block; margin: auto;">
 </p>
 
 Our model shows also improvements when using long context on two downstream tasks, TREC question classification and WebQS question answering. 
