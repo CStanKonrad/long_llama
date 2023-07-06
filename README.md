@@ -4,7 +4,7 @@
 # LongLLaMA: Focused Transformer Training for Context Scaling
 
 
-[Colab](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb) | [TLDR](#TLDR) | [Overview](#Overview) | [Usage](#Usage) | [LongLLaMA performance](#LongLLaMA-performance) | [Authors](#Authors) | [Citation](#Citation) | [License](License)
+[Colab](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb) | [TLDR](#TLDR) | [Overview](#Overview) | [Usage](#Usage) | [LongLLaMA performance](#LongLLaMA-performance) | [Authors](#Authors) | [Citation](#Citation) | [License](License) | [Acknowledgments](#Acknowledgments)
 
 ## TLDR
 This repository contains the inference code and a checkpoint of **LongLLaMA**. LongLLaMA is a large language model capable of handling long contexts, it is based on [OpenLLaMA](https://github.com/openlm-research/open_llama) and finetuned with the **FoT** method.
@@ -126,8 +126,8 @@ We manage to achieve good performance on the passkey retrieval task. The code fo
 
 Our model shows also improvements when using long context on two downstream tasks, TREC question classification and WebQS question answering. 
 
-| Dataset | TREC  | WebQS |
-| --- | --- | --- | --- | --- |
+| Dataset | | TREC  | WebQS |
+| --- | --- | --- | --- |
 | | | LongLLaMA 3B | LongLLaMA 3B |
 | $2K$ | | 67.0 |  21.2 |
 | $4K$ | | 71.6 | 21.4 |
@@ -183,5 +183,5 @@ TODO
 The code and checkpoints are licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 Some of the examples use external code (see headers of files for copyright notices and licenses).
 
-## Acknowledgment
+## Acknowledgments
 We gratefully acknowledge the TPU Research Cloud program, which was instrumental to our research by providing significant computational resources. We are also grateful to Xinyang Geng and Hao Liu for releasing [OpenLLaMA](https://github.com/openlm-research/open_llama) checkpoints and the [EasyLM](https://github.com/young-geng/EasyLM) library.
