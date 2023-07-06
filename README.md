@@ -75,7 +75,7 @@ print(tokenizer.decode(generation_output[0]))
 
 ### Additional configuration
 LongLLaMA has several other parameters:
-* `mem_layers` specifies layers endowed with memory (should be a subset of the layers mentioned in the checkpoint description).
+* `mem_layers` specifies layers endowed with memory (should be either an empty list or a list of all layers specified in the description of the checkpoint).
 * `mem_dtype` allows changing the type of memory cache
 * `mem_attention_grouping` can trade off speed for reduced memory usage. 
   When equal to `(4, 2048)`, the memory layers will process at most $4*2048$ queries at once ($4$ heads and $2048$ queries for each head).
@@ -87,7 +87,7 @@ from transformers import LlamaTokenizer, AutoModelForCausalLM
 tokenizer = LlamaTokenizer.from_pretrained("syzymon/long_llama_3b")
 model = AutoModelForCausalLM.from_pretrained(
     "syzymon/long_llama_3b", torch_dtype=torch.float32, 
-    mem_layers=[6], 
+    mem_layers=[], 
     mem_dtype='bfloat16',
     trust_remote_code=True,
     mem_attention_grouping=(4, 2048),

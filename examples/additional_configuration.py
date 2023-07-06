@@ -8,7 +8,7 @@ tokenizer = LlamaTokenizer.from_pretrained(MODEL_PATH)
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_PATH,
     torch_dtype=torch.float32,
-    mem_layers=[6],
+    mem_layers=[],
     mem_dtype="bfloat16",
     trust_remote_code=True,
     mem_attention_grouping=(4, 2048),
