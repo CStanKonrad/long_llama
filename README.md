@@ -36,7 +36,8 @@ with three layers used for context extension. Crucially, LongLLama is able to ex
 See also: [colab with an example usage of LongLLaMA](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb).
 ### Requirements
 ```
-pip3 install transformers==4.30 sentencepiece accelerate numpy torch
+pip install --upgrade pip
+pip install transformers==4.30  sentencepiece accelerate -q
 ```
 
 ### Loading model
