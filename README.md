@@ -37,7 +37,7 @@ See also: [colab with an example usage of LongLLaMA](https://colab.research.goog
 ### Requirements
 ```
 pip install --upgrade pip
-pip install transformers==4.30  sentencepiece accelerate -q
+pip install transformers==4.30  sentencepiece accelerate
 ```
 
 ### Loading model
