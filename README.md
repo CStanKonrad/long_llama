@@ -20,7 +20,7 @@ We release our research preview of LongLLaMA, a large language model capable of 
 with three layers used for context extension. Crucially, LongLLama is able to extrapolate much beyond the context length seen in training: $8k$. E.g., in the key retrieval task, it can handle inputs of length $256k$.
 
 
-|  | [LongLLaMA-3B](https://huggingface.co/syzymon/long_llama_3b) | LongLLaMA-7B *(coming soon)*|  LongLLaMA-13B *(coming soon)*|
+|  | [LongLLaMA-3B](https://huggingface.co/syzymon/long_llama_3b) | LongLLaMA-7B<br />*(coming soon)*|  LongLLaMA-13B<br />*(coming soon)*|
 |----------------|----------|-----------|-----------|
 | Source model         | [OpenLLaMA-3B](https://huggingface.co/openlm-research/open_llama_3b_easylm)      | -        | - |
 | Source model tokens     | 1T      | -       | - |
@@ -124,15 +124,14 @@ We manage to achieve good performance on the passkey retrieval task. The code fo
 <img src="assets/plot_passkey.png" alt="LongLLaMA" style="width: 70%; min-width: 300px; display: block; margin: auto;">
 </p>
 
-Our model shows also improvements when using long context on two downstream tasks, TREC question classification and WebQS question answering. 
+Our LongLLaMA 3B model shows also improvements when using long context on two downstream tasks, TREC question classification and WebQS question answering. 
 
-| Dataset | | TREC  | WebQS |
-| --- | --- | --- | --- |
-| | | LongLLaMA 3B | LongLLaMA 3B |
-| $2K$ | | 67.0 |  21.2 |
-| $4K$ | | 71.6 | 21.4 |
-| $6K$ | | 72.9 | 22.2 |
-| $8K$ | | **73.3** | **22.4** |
+| Context/Dataset | TREC  | WebQS |
+| --- | --- | --- |
+| $2K$ | 67.0 |  21.2 |
+| $4K$ | 71.6 | 21.4 |
+| $6K$ | 72.9 | 22.2 |
+| $8K$ | **73.3** | **22.4** |
 
 
 LongLLama retains performance on tasks that do not require long context. We provide a comparison with OpenLLaMA
