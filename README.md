@@ -13,7 +13,7 @@ LongLLaMA is built upon the foundation of [OpenLLaMA](https://github.com/openlm-
 
 
 ## Overview
-[Focused Transformer: Contrastive Training for Context Scaling](TODO) (FoT) presents a simple method for endowing language models with the ability to handle context consisting possibly of millions of tokens while training on significantly shorter input. FoT permits a subset of attention layers to access a memory cache of (key, value) pairs to extend the context length. The distinctive aspect of FoT is its training procedure, drawing from contrastive learning. Specifically, we deliberately expose the memory attention layers to both relevant and irrelevant keys (like negative samples from unrelated documents). This strategy encourages the model to differentiate keys connected with semantically diverse values, thereby enhancing their structure. This, in turn, makes it possible to extrapolate the effective context length much beyond what is seen in training. 
+[Focused Transformer: Contrastive Training for Context Scaling](TODO) (FoT) presents a simple method for endowing language models with the ability to handle context consisting possibly of millions of tokens while training on significantly shorter input. FoT permits a subset of attention layers to access a memory cache of (key, value) pairs to extend the context length. The distinctive aspect of FoT is its training procedure, drawing from contrastive learning. Specifically, we deliberately expose the memory attention layers to both relevant and irrelevant keys (like negative samples from unrelated documents). This strategy incentives the model to differentiate keys connected with semantically diverse values, thereby enhancing their structure. This, in turn, makes it possible to extrapolate the effective context length much beyond what is seen in training. 
 
 
 **LongLLaMA** is an [OpenLLaMA](https://github.com/openlm-research/open_llama) model finetuned with the FoT method,
@@ -126,7 +126,7 @@ We manage to achieve good performance on the passkey retrieval task from [Landma
 <img src="assets/plot_passkey.png" alt="LongLLaMA" style="width: 70%; min-width: 300px; display: block; margin: auto;">
 </p>
 
-Our LongLLaMA 3B model shows also improvements when using long context on two downstream tasks, TREC question classification and WebQS question answering. 
+Our LongLLaMA 3B model also shows improvements when using long context on two downstream tasks, TREC question classification and WebQS question answering. 
 <center>
 
 
@@ -140,7 +140,7 @@ Our LongLLaMA 3B model shows also improvements when using long context on two do
 </center>
 
 LongLLama retains performance on tasks that do not require long context. We provide a comparison with OpenLLaMA
-on [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness). 
+on [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) in a zero-shot setting. 
 <center>
 
 | Task/Metric | OpenLLaMA-3B | LongLLaMA-3B |
