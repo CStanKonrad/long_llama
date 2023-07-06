@@ -25,7 +25,7 @@ LongLLaMA is built upon the foundation of [OpenLLaMA](https://github.com/openlm-
 
 
 **LongLLaMA** is an [OpenLLaMA](https://github.com/openlm-research/open_llama) model finetuned with the FoT method,
-with three layers used for context extension. Crucially, LongLLama is able to extrapolate much beyond the context length seen in training: $8k$. E.g., in the key retrieval task, it can handle inputs of length $256k$.
+with three layers used for context extension. **Crucially, LongLLaMA is able to extrapolate much beyond the context length seen in training: $8k$. E.g., in the key retrieval task, it can handle inputs of length $256k$**.
 
 <div align="center">
 
@@ -147,7 +147,7 @@ Our LongLLaMA 3B model also shows improvements when using long context on two do
 
 </div>
 
-LongLLama retains performance on tasks that do not require long context. We provide a comparison with OpenLLaMA
+LongLLaMA retains performance on tasks that do not require long context. We provide a comparison with OpenLLaMA
 on [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) in a zero-shot setting. 
 <div align="center">
 
