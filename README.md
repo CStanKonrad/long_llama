@@ -19,6 +19,7 @@ We release our research preview of LongLLaMA, a large language model capable of 
 **LongLLaMA** is an [OpenLLaMA](https://github.com/openlm-research/open_llama) model finetuned with the FoT method,
 with three layers used for context extension. Crucially, LongLLama is able to extrapolate much beyond the context length seen in training: $8k$. E.g., in the key retrieval task, it can handle inputs of length $256k$.
 
+<center>
 
 |  | [LongLLaMA-3B](https://huggingface.co/syzymon/long_llama_3b) | LongLLaMA-7B<br />*(coming soon)*|  LongLLaMA-13B<br />*(coming soon)*|
 |----------------|----------|-----------|-----------|
@@ -27,7 +28,7 @@ with three layers used for context extension. Crucially, LongLLama is able to ex
 | Fine-tuning tokens  | 10B     | -     | -|
 | Memory layers         |  6, 12, 18        |  -        | -|
 
-
+</center>
 
 
 ## Usage
@@ -125,6 +126,8 @@ We manage to achieve good performance on the passkey retrieval task. The code fo
 </p>
 
 Our LongLLaMA 3B model shows also improvements when using long context on two downstream tasks, TREC question classification and WebQS question answering. 
+<center>
+
 
 | Context/Dataset | TREC  | WebQS |
 | --- | --- | --- |
@@ -133,9 +136,12 @@ Our LongLLaMA 3B model shows also improvements when using long context on two do
 | $6K$ | 72.9 | 22.2 |
 | $8K$ | **73.3** | **22.4** |
 
+</center>
 
 LongLLama retains performance on tasks that do not require long context. We provide a comparison with OpenLLaMA
 on [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness). 
+<center>
+
 | Task/Metric | OpenLLaMA-3B | LongLLaMA-3B |
 |----------------|----------|-----------|
 | anli_r1/acc | 0.33 | 0.32 |
@@ -161,6 +167,7 @@ on [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness).
 | winogrande/acc | 0.62 | 0.60 |
 | Avg score | 0.53 | 0.53 |
 
+</center>
 
 ## Authors
 - [Szymon Tworkowski](https://scholar.google.com/citations?user=1V8AeXYAAAAJ&hl=en)
