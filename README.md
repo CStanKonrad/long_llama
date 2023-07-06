@@ -7,9 +7,9 @@
 [Colab](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb) | [TLDR](#TLDR) | [Overview](#Overview) | [Usage](#Usage) | [LongLLaMA performance](#LongLLaMA-performance) | [Authors](#Authors) | [Citation](#Citation) | [License](License) | [Acknowledgments](#Acknowledgments)
 
 ## TLDR
-This repository contains the inference code and a checkpoint of **LongLLaMA**. LongLLaMA is a large language model capable of handling long contexts, it is based on [OpenLLaMA](https://github.com/openlm-research/open_llama) and finetuned with the **FoT** method.
+This repository contains the research preview of **LongLLaMA, a large language model capable of handling long contexts, up to 256k tokens or even more**. 
 
-We release our research preview of LongLLaMA, a large language model capable of handling long contexts, up to 256k tokens or even more. LongLLaMA is built upon the foundation of OpenLLaMA and fine-tuned using the Focused Transformer (FoT) method.  We release a smaller 3B variant of LongLLaMA model on a permissive license (Apache 2.0) and inference code supporting longer contexts on Hugging Face. Our model weights can serve as the drop-in replacement of LLaMA in existing implementations (for short context up to 2048 tokens). Additionally, we provide evaluation results and comparisons against the original OpenLLaMA models. Stay tuned for further updates.
+LongLLaMA is built upon the foundation of [OpenLLaMA](https://github.com/openlm-research/open_llama) and fine-tuned using the Focused Transformer (FoT) method.  We release a smaller 3B variant of LongLLaMA model on a permissive license (Apache 2.0) and inference code supporting longer contexts on [Hugging Face](https://huggingface.co/syzymon/long_llama_3b). Our model weights can serve as the drop-in replacement of LLaMA in existing implementations (for short context up to 2048 tokens). Additionally, we provide evaluation results and comparisons against the original OpenLLaMA models. Stay tuned for further updates.
 
 
 ## Overview
@@ -44,8 +44,8 @@ pip3 install transformers==4.30 sentencepiece accelerate numpy torch
 import torch
 from transformers import LlamaTokenizer, AutoModelForCausalLM
 
-tokenizer = LlamaTokenizer.from_pretrained(MODEL_PATH)
-model = AutoModelForCausalLM.from_pretrained(MODEL_PATH, 
+tokenizer = LlamaTokenizer.from_pretrained("syzymon/long_llama_3b")
+model = AutoModelForCausalLM.from_pretrained("syzymon/long_llama_3b", 
                                             torch_dtype=torch.float32, 
                                             trust_remote_code=True)
 ```
@@ -83,9 +83,9 @@ LongLLaMA has several other parameters:
 import torch
 from transformers import LlamaTokenizer, AutoModelForCausalLM
 
-tokenizer = LlamaTokenizer.from_pretrained(MODEL_PATH)
+tokenizer = LlamaTokenizer.from_pretrained("syzymon/long_llama_3b")
 model = AutoModelForCausalLM.from_pretrained(
-    MODEL_PATH, torch_dtype=torch.float32, 
+    "syzymon/long_llama_3b", torch_dtype=torch.float32, 
     mem_layers=[6], 
     mem_dtype='bfloat16',
     trust_remote_code=True,
@@ -101,8 +101,8 @@ model = AutoModelForCausalLM.from_pretrained(
 from transformers import LlamaTokenizer, LlamaForCausalLM
 import torch
 
-tokenizer = LlamaTokenizer.from_pretrained(MODEL_PATH)
-model = LlamaForCausalLM.from_pretrained(MODEL_PATH, torch_dtype=torch.float32)
+tokenizer = LlamaTokenizer.from_pretrained("syzymon/long_llama_3b")
+model = LlamaForCausalLM.from_pretrained("syzymon/long_llama_3b", torch_dtype=torch.float32)
 ```
 
 
@@ -119,7 +119,7 @@ For simplicity, context extension is realized with a memory cache and full atten
 ## LongLLaMA performance
 We present some illustrative examples of LongLLaMA results and refer to our paper [Focused Transformer: Contrastive Training for Context Scaling](TODO) for more details.
 
-We manage to achieve good performance on the passkey retrieval task. The code for generating the prompt and running the model is located in `examples/passkey.py`. 
+We manage to achieve good performance on the passkey retrieval task from [Landmark Attention: Random-Access Infinite Context Length for Transformers](https://arxiv.org/abs/2305.16300). The code for generating the prompt and running the model is located in `examples/passkey.py`. 
 
 <p align="center" width="100%">
 <img src="assets/plot_passkey.png" alt="LongLLaMA" style="width: 70%; min-width: 300px; display: block; margin: auto;">
