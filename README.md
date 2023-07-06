@@ -34,7 +34,7 @@ with three layers used for context extension. Crucially, LongLLama is able to ex
 
 ## Usage
 
-See also: [colab with an example usage of LongLLaMA](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb).
+See also: [Colab with an example usage of LongLLaMA](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb).
 ### Requirements
 ```
 pip install --upgrade pip
