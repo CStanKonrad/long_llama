@@ -3,8 +3,9 @@
 
 # LongLLaMA: Focused Transformer Training for Context Scaling
 
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb)
 
-[Colab](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb) | [TLDR](#TLDR) | [Overview](#Overview) | [Usage](#Usage) | [LongLLaMA performance](#LongLLaMA-performance) | [Authors](#Authors) | [Citation](#Citation) | [License](License) | [Acknowledgments](#Acknowledgments)
+ [TLDR](#TLDR) | [Overview](#Overview) | [Usage](#Usage) | [LongLLaMA performance](#LongLLaMA-performance) | [Authors](#Authors) | [Citation](#Citation) | [License](License) | [Acknowledgments](#Acknowledgments)
 
 ## TLDR
 This repository contains the research preview of **LongLLaMA, a large language model capable of handling long contexts of 256k tokens or even more**. 
