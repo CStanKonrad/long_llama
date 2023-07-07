@@ -148,7 +148,7 @@ Our LongLLaMA 3B model also shows improvements when using long context on two do
 </div>
 
 LongLLaMA retains performance on tasks that do not require long context. We provide a comparison with OpenLLaMA
-on [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) in a zero-shot setting. 
+on [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) in the zero-shot setting. 
 <div align="center">
 
 | Task/Metric | OpenLLaMA-3B | LongLLaMA-3B |
