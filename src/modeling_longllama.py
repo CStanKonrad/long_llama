@@ -431,7 +431,7 @@ class LongLlamaDecoderLayer(nn.Module):
         output_attentions: Optional[bool] = False,
         use_cache: Optional[bool] = False,
         mem_cache: Optional[LongLlamaMemCache] = None,
-    ) -> Tuple[torch.FloatTensor, Optional[Tuple[torch.FloatTensor, torch.FloatTensor]]]:
+    ) -> Tuple[torch.FloatTensor, Optional[Tuple[torch.FloatTensor, torch.FloatTensor, LongLlamaMemCache]]]:
         """
         Args:
             hidden_states (`torch.FloatTensor`): input to the layer of shape `(batch, seq_len, embed_dim)`
@@ -478,7 +478,7 @@ class LongLlamaDecoderLayer(nn.Module):
         if use_cache:
             outputs += (present_key_value,)
 
-        return outputs, mem_cache
+        return outputs + (mem_cache, )
 
 
 LONGLLAMA_START_DOCSTRING = r"""
@@ -778,11 +778,11 @@ class LongLlamaModel(LongLlamaPreTrainedModel):
             past_key_value = past_key_values[idx] if past_key_values is not None else None
             mem_cache = mem_caches[idx] if mem_caches else None
 
-            if self.gradient_checkpointing and self.training:
+            if mem_cache is not None and idx not in self.mem_layers:
+                raise ValueError("Memory cache provided for a non-memory leayer")
 
-                if mem_cache is not None:
-                    raise ValueError("Gradient checkpointing is not supported on memory layers")
 
+            if self.gradient_checkpointing and self.training and idx not in self.mem_layers:
                 def create_custom_forward(module):
                     def custom_forward(*inputs):
                         # None for past_key_value
@@ -808,7 +808,8 @@ class LongLlamaModel(LongLlamaPreTrainedModel):
                     mem_cache=mem_cache,
                 )
 
-            layer_outputs, new_mem_cache = layer_outputs
+            new_mem_cache = layer_outputs[-1]
+            layer_outputs = layer_outputs[:-1]
             next_mem_caches += (new_mem_cache,)
 
             hidden_states = layer_outputs[0]
