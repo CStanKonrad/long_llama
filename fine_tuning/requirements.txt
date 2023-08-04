@@ -1,0 +1,6 @@
+transformers==4.30.0
+sentencepiece
+accelerate
+torch>=2.0
+six
+datasets

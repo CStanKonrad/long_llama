@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import torch
 from typing import Tuple, Optional
 
+
 @dataclass
 class LongLlamaMemConfig:
     """
@@ -15,7 +16,7 @@ class LongLlamaMemConfig:
             Specifies storing type for keys and values
         attention_grouping (`Tuple[int, int]`, *optional*)
             One can trade speed for memory by performing attention
-            in memory layers sequentially. 
+            in memory layers sequentially.
             When equal to `(4, 128)` the memory layers will process at most 4 heads and 128 queries
             from each head at once. That is at most 512 queries at once.
     """
@@ -42,7 +43,9 @@ class LongLlamaMemCache:
     masks: torch.FloatTensor
 
 
-def mem_apply_update(prev_mem_cache: LongLlamaMemCache, new_mem_content: LongLlamaMemCache, mem_config: LongLlamaMemConfig):
+def mem_apply_update(
+    prev_mem_cache: LongLlamaMemCache, new_mem_content: LongLlamaMemCache, mem_config: LongLlamaMemConfig
+):
     def update_one(prev, new):
         if len(prev.shape) != 4 or len(new.shape) != 4:
             raise ValueError(f"Memory cache content should be consistent in shape got {prev.shape} {new.shape}")

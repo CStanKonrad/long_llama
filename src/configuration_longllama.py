@@ -74,10 +74,14 @@ class LongLlamaConfig(PretrainedConfig):
             Type for keys and values stored in memory
         mem_attention_grouping (`Tuple[int, int]`, *optional*, defaults to `None`):
             One can trade speed for memory by performing attention
-            in memory layers sequentially. 
+            in memory layers sequentially.
             When equal to `(4, 2048)` the memory layers will process at most 4 heads and 2048 queries from each head at once.
             That is at most 4*2048 queries at once.
-        
+        torch_attention (`bool`, *optional*, defaults to `False`):
+            Whether to use torch scaled_dot_product_attention
+        gradient_checkpoint_every_ith (`int`, *optional*, defaults to `1`):
+            When gradient checkpointing is enabled checkpoint every ith layer
+
         Example:
 
     ```python
@@ -116,6 +120,8 @@ class LongLlamaConfig(PretrainedConfig):
         mem_positionals=True,
         mem_dtype="bfloat16",
         mem_attention_grouping=None,
+        torch_attention=False,
+        gradient_checkpoint_every_ith=1,
         **kwargs,
     ):
         self.vocab_size = vocab_size
@@ -133,6 +139,8 @@ class LongLlamaConfig(PretrainedConfig):
         self.mem_positionals = mem_positionals
         self.mem_dtype = mem_dtype
         self.mem_attention_grouping = mem_attention_grouping
+        self.torch_attention = torch_attention
+        self.gradient_checkpoint_every_ith = gradient_checkpoint_every_ith
         super().__init__(
             pad_token_id=pad_token_id,
             bos_token_id=bos_token_id,

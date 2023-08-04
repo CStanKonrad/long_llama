@@ -28,9 +28,18 @@ from torch import nn
 from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss, MSELoss
 
 from transformers.activations import ACT2FN
-from transformers.modeling_outputs import BaseModelOutputWithPast, CausalLMOutputWithPast, SequenceClassifierOutputWithPast
+from transformers.modeling_outputs import (
+    BaseModelOutputWithPast,
+    CausalLMOutputWithPast,
+    SequenceClassifierOutputWithPast,
+)
 from transformers.modeling_utils import PreTrainedModel
-from transformers.utils import add_start_docstrings, add_start_docstrings_to_model_forward, logging, replace_return_docstrings
+from transformers.utils import (
+    add_start_docstrings,
+    add_start_docstrings_to_model_forward,
+    logging,
+    replace_return_docstrings,
+)
 from .configuration_longllama import LongLlamaConfig
 from .longllama_utils import mem_apply_update, LongLlamaMemCache, LongLlamaMemConfig
 
@@ -314,7 +323,6 @@ class LongLlamaAttention(nn.Module):
                 position_ids = position_ids[:, :, num_elems_to_drop:, :]
                 attention_mask = attention_mask[..., num_elems_to_drop:]
 
-
         # FoT additionally stores position_ids to support long inputs
         past_key_value = (key_states, value_states, position_ids) if use_cache else None
 
@@ -328,15 +336,13 @@ class LongLlamaAttention(nn.Module):
             query_states = rotate_one(query_states, cos, sin, rel_pos_ids[:, -query_states.shape[-2] :])
             key_states = rotate_one(key_states, cos, sin, rel_pos_ids)
 
-
         if self.mem_config is not None and self.mem_config.attention_grouping is not None:
             attn_grouping_h, attn_grouping_q = self.mem_config.attention_grouping
             if attn_grouping_h <= 0 or attn_grouping_q <= 0:
                 raise ValueError("Attention grouping should be positive")
         else:
             attn_grouping_h, attn_grouping_q = self.num_heads, q_len
-            
-        
+
         attn_output_h = []
         for beg_h in range(0, self.num_heads, attn_grouping_h):
             end_h = min(beg_h + attn_grouping_h, self.num_heads)
@@ -345,42 +351,93 @@ class LongLlamaAttention(nn.Module):
             for beg_q in range(0, q_len, attn_grouping_q):
                 end_q = min(beg_q + attn_grouping_q, q_len)
 
-                attn_weights = torch.matmul(query_states[:, beg_h:end_h, beg_q:end_q], key_states[:, beg_h:end_h].transpose(2, 3)) / math.sqrt(self.head_dim)
+                if self.config.torch_attention:
+                    if mem_cache is not None:
+                        attn_keys = torch.concat(
+                            [key_states[:, beg_h:end_h], mem_cache.keys[:, beg_h:end_h].to(key_states.dtype)], dim=-2
+                        )
+                        attn_values = torch.concat(
+                            [value_states[:, beg_h:end_h], mem_cache.values[:, beg_h:end_h].to(value_states.dtype)],
+                            dim=-2,
+                        )
+                        mem_mask = mem_cache.masks.squeeze(-1).unsqueeze(-2)
+                        assert len(mem_mask.shape) == 4
+                        assert mem_mask.shape[2] == 1
+                        assert mem_mask.shape[3] == mem_cache.keys.shape[-2]
+                        mem_mask = torch.broadcast_to(
+                            mem_mask, (mem_mask.shape[0], mem_mask.shape[1], end_q - beg_q, mem_mask.shape[3])
+                        )
+                        attn_mask = torch.concat([attention_mask[:, :, beg_q:end_q], mem_mask], dim=-1)
+                        assert attn_mask.shape[-1] == attn_keys.shape[-2]
+                    else:
+                        attn_keys = key_states[:, beg_h:end_h]
+                        attn_values = value_states[:, beg_h:end_h]
+                        attn_mask = attention_mask[:, :, beg_q:end_q]
 
-                if attn_weights.size() != (bsz, end_h - beg_h, end_q - beg_q, kv_seq_len):
-                    raise ValueError(
-                        f"Attention weights should be of size {(bsz, end_h - beg_h, end_q - beg_q, kv_seq_len)}, but is"
-                        f" {attn_weights.size()}"
+                    attn_queries = query_states[:, beg_h:end_h, beg_q:end_q]
+
+                    attn_output = torch.nn.functional.scaled_dot_product_attention(
+                        query=attn_queries, key=attn_keys, value=attn_values, attn_mask=attn_mask
                     )
-
-                if attention_mask.size() != (bsz, 1, q_len, kv_seq_len):
-                    raise ValueError(
-                        f"Attention mask should be of size {(bsz, 1, q_len, kv_seq_len)}, but is {attention_mask.size()}"
-                    )
-                attn_weights = attn_weights + attention_mask[:, :, beg_q:end_q]
-                min_value = torch.finfo(attn_weights.dtype).min if -1000000.0 < torch.finfo(attn_weights.dtype).min else -1000000.0 
-                attn_weights = torch.max(attn_weights, torch.tensor(min_value, device=attn_weights.device, dtype=attn_weights.dtype))
-
-                if mem_cache is not None:
-                    mem_mask = mem_cache.masks.squeeze(-1).unsqueeze(-2)
-                    mem_attn_weights = torch.matmul(
-                        query_states[:, beg_h:end_h, beg_q:end_q], mem_cache.keys[:, beg_h:end_h].transpose(2, 3).to(key_states.dtype)
+                    attn_output_q.append(attn_output)
+                else:
+                    attn_weights = torch.matmul(
+                        query_states[:, beg_h:end_h, beg_q:end_q], key_states[:, beg_h:end_h].transpose(2, 3)
                     ) / math.sqrt(self.head_dim)
 
-                    assert mem_mask.shape[2] == 1
-                    mem_attn_weights = mem_attn_weights + mem_mask
-                    min_value = torch.finfo(mem_attn_weights.dtype).min if -1000000.0 < torch.finfo(mem_attn_weights.dtype).min else -1000000.0
-                    mem_attn_weights = torch.max(mem_attn_weights, torch.tensor(min_value, device=mem_attn_weights.device, dtype=mem_attn_weights.dtype))
+                    if attn_weights.size() != (bsz, end_h - beg_h, end_q - beg_q, kv_seq_len):
+                        raise ValueError(
+                            f"Attention weights should be of size {(bsz, end_h - beg_h, end_q - beg_q, kv_seq_len)}, but is"
+                            f" {attn_weights.size()}"
+                        )
 
-                    attn_weights = torch.concat([attn_weights, mem_attn_weights], dim=-1)
-                    combined_value_states = torch.concat([value_states[:, beg_h:end_h], mem_cache.values[:, beg_h:end_h].to(value_states.dtype)], dim=-2)
-                else:
-                    combined_value_states = value_states[:, beg_h:end_h]
-                # upcast attention to fp32
-                attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query_states.dtype)
-                attn_output = torch.matmul(attn_weights, combined_value_states)
-                assert attn_output.shape[-2] == end_q - beg_q
-                attn_output_q.append(attn_output)
+                    if attention_mask.size() != (bsz, 1, q_len, kv_seq_len):
+                        raise ValueError(
+                            f"Attention mask should be of size {(bsz, 1, q_len, kv_seq_len)}, but is {attention_mask.size()}"
+                        )
+                    attn_weights = attn_weights + attention_mask[:, :, beg_q:end_q]
+                    min_value = (
+                        torch.finfo(attn_weights.dtype).min
+                        if -1000000.0 < torch.finfo(attn_weights.dtype).min
+                        else -1000000.0
+                    )
+                    attn_weights = torch.max(
+                        attn_weights, torch.tensor(min_value, device=attn_weights.device, dtype=attn_weights.dtype)
+                    )
+
+                    if mem_cache is not None:
+                        mem_mask = mem_cache.masks.squeeze(-1).unsqueeze(-2)
+                        mem_attn_weights = torch.matmul(
+                            query_states[:, beg_h:end_h, beg_q:end_q],
+                            mem_cache.keys[:, beg_h:end_h].transpose(2, 3).to(key_states.dtype),
+                        ) / math.sqrt(self.head_dim)
+
+                        assert mem_mask.shape[2] == 1
+                        mem_attn_weights = mem_attn_weights + mem_mask
+                        min_value = (
+                            torch.finfo(mem_attn_weights.dtype).min
+                            if -1000000.0 < torch.finfo(mem_attn_weights.dtype).min
+                            else -1000000.0
+                        )
+                        mem_attn_weights = torch.max(
+                            mem_attn_weights,
+                            torch.tensor(min_value, device=mem_attn_weights.device, dtype=mem_attn_weights.dtype),
+                        )
+
+                        attn_weights = torch.concat([attn_weights, mem_attn_weights], dim=-1)
+                        combined_value_states = torch.concat(
+                            [value_states[:, beg_h:end_h], mem_cache.values[:, beg_h:end_h].to(value_states.dtype)],
+                            dim=-2,
+                        )
+                    else:
+                        combined_value_states = value_states[:, beg_h:end_h]
+                    # upcast attention to fp32
+                    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(
+                        query_states.dtype
+                    )
+                    attn_output = torch.matmul(attn_weights, combined_value_states)
+                    assert attn_output.shape[-2] == end_q - beg_q
+                    attn_output_q.append(attn_output)
             attn_output_h.append(torch.concat(attn_output_q, dim=-2))
 
         attn_output = torch.concat(attn_output_h, dim=-3)
@@ -401,7 +458,9 @@ class LongLlamaAttention(nn.Module):
 
         if mem_no_local_cache:
             if mem_cache is not None:
-                mem_cache = mem_apply_update(prev_mem_cache=mem_cache, new_mem_content=mem_update, mem_config=self.mem_config)
+                mem_cache = mem_apply_update(
+                    prev_mem_cache=mem_cache, new_mem_content=mem_update, mem_config=self.mem_config
+                )
             else:
                 mem_cache = mem_update
 
@@ -431,7 +490,7 @@ class LongLlamaDecoderLayer(nn.Module):
         output_attentions: Optional[bool] = False,
         use_cache: Optional[bool] = False,
         mem_cache: Optional[LongLlamaMemCache] = None,
-    ) -> Tuple[torch.FloatTensor, Optional[Tuple[torch.FloatTensor, torch.FloatTensor, LongLlamaMemCache]]]:
+    ) -> Tuple[torch.FloatTensor, Optional[Tuple[torch.FloatTensor, torch.FloatTensor]]]:
         """
         Args:
             hidden_states (`torch.FloatTensor`): input to the layer of shape `(batch, seq_len, embed_dim)`
@@ -478,7 +537,7 @@ class LongLlamaDecoderLayer(nn.Module):
         if use_cache:
             outputs += (present_key_value,)
 
-        return outputs + (mem_cache, )
+        return outputs + (mem_cache,)
 
 
 LONGLLAMA_START_DOCSTRING = r"""
@@ -614,8 +673,10 @@ def _prepare_pos_ids(past_key_values, batch_size, input_length, device):
     if past_key_values is not None:
         # take previous max pos_id + 1
         if past_key_values[0][2].shape[0] != batch_size:
-            raise ValueError(f"first dimension of past_key_values should match batch size: {batch_size}"
-                             f"but got {past_key_values[0][2].shape[0]}")
+            raise ValueError(
+                f"first dimension of past_key_values should match batch size: {batch_size}"
+                f"but got {past_key_values[0][2].shape[0]}"
+            )
         next_pos = torch.max(past_key_values[0][2].view(batch_size, -1), dim=-1)[0] + 1
         next_pos = next_pos.view(batch_size, 1)
     else:
@@ -643,17 +704,21 @@ class LongLlamaModel(LongLlamaPreTrainedModel):
     def __init__(self, config: LongLlamaConfig):
         super().__init__(config)
         self.mem_layers = config.mem_layers
-        self.mem_config = LongLlamaMemConfig(positionals=config.mem_positionals, cache_dtype=getattr(torch, config.mem_dtype), attention_grouping=config.mem_attention_grouping)
+        self.mem_config = LongLlamaMemConfig(
+            positionals=config.mem_positionals,
+            cache_dtype=getattr(torch, config.mem_dtype),
+            attention_grouping=config.mem_attention_grouping,
+        )
         self.padding_idx = config.pad_token_id
         self.vocab_size = config.vocab_size
 
         self.embed_tokens = nn.Embedding(config.vocab_size, config.hidden_size, self.padding_idx)
 
-        
-
-        for mem_layer_id in self.mem_layers :
+        for mem_layer_id in self.mem_layers:
             if mem_layer_id < 0 or mem_layer_id >= config.num_hidden_layers:
-                raise ValueError(f"Memory layer ids should be between 0 and {config.num_hidden_layers}, got {mem_layer_id}")
+                raise ValueError(
+                    f"Memory layer ids should be between 0 and {config.num_hidden_layers}, got {mem_layer_id}"
+                )
 
         layers = []
         for layer_id in range(config.num_hidden_layers):
@@ -781,8 +846,13 @@ class LongLlamaModel(LongLlamaPreTrainedModel):
             if mem_cache is not None and idx not in self.mem_layers:
                 raise ValueError("Memory cache provided for a non-memory leayer")
 
+            if (
+                self.gradient_checkpointing
+                and self.training
+                and mem_cache is None
+                and idx % self.config.gradient_checkpoint_every_ith == 0
+            ):
 
-            if self.gradient_checkpointing and self.training and idx not in self.mem_layers:
                 def create_custom_forward(module):
                     def custom_forward(*inputs):
                         # None for past_key_value
@@ -939,8 +1009,10 @@ def _handle_long_input(
     last_context_length,
 ):
     if output_attentions:
-        logger.warning(f"Outputing attentions is not supported in LongLlamaForCausalLM and LongLlamaForSequenceClassification. "
-                     f"Attention of the last window will be returned")
+        logger.warning(
+            f"Outputing attentions is not supported in LongLlamaForCausalLM and LongLlamaForSequenceClassification. "
+            f"Attention of the last window will be returned"
+        )
 
     past_key_values, mem_caches = _split_past_key_values(past_key_values)
 
@@ -1060,8 +1132,9 @@ def _handle_long_input(
     )
 
     if not return_dict:
-        outputs =tuple(
-            v for v in [outputs.last_hidden_state, outputs.past_key_values, outputs.hidden_states, outputs.attentions]
+        outputs = tuple(
+            v
+            for v in [outputs.last_hidden_state, outputs.past_key_values, outputs.hidden_states, outputs.attentions]
             if v is not None
         )
     return outputs
@@ -1071,12 +1144,10 @@ def _handle_long_input(
 class LongLlamaForCausalLM(LongLlamaPreTrainedModel):
     _tied_weights_keys = ["lm_head.weight"]
 
-    def __init__(
-        self, config
-    ):
+    def __init__(self, config):
         super().__init__(config)
         self.context_window_length = config.max_position_embeddings
-         
+
         self.model = LongLlamaModel(config)
 
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
@@ -1150,7 +1221,9 @@ class LongLlamaForCausalLM(LongLlamaPreTrainedModel):
         >>> tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
         "Hey, are you conscious? Can you talk to me?\nI'm not conscious, but I can talk to you."
         ```"""
-        last_context_length = last_context_length if last_context_length is not None else self.config.last_context_length
+        last_context_length = (
+            last_context_length if last_context_length is not None else self.config.last_context_length
+        )
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
         output_hidden_states = (
             output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
@@ -1201,7 +1274,13 @@ class LongLlamaForCausalLM(LongLlamaPreTrainedModel):
         )
 
     def prepare_inputs_for_generation(
-        self, input_ids, past_key_values=None, attention_mask=None, inputs_embeds=None, last_context_length=None, **kwargs
+        self,
+        input_ids,
+        past_key_values=None,
+        attention_mask=None,
+        inputs_embeds=None,
+        last_context_length=None,
+        **kwargs,
     ):
         if self._has_generation_cache(past_key_values):
             input_ids = input_ids[:, -1:]
@@ -1255,15 +1334,13 @@ class LongLlamaForCausalLM(LongLlamaPreTrainedModel):
     each row of the batch).
     """,
     LONGLLAMA_START_DOCSTRING,
-    LONGLLAMA_MEML_DOCSTRING
+    LONGLLAMA_MEML_DOCSTRING,
 )
 # Modified from transformers.models.llama.modeling_llama.LlamaForSequenceClassification
 class LongLlamaForSequenceClassification(LongLlamaPreTrainedModel):
     _keys_to_ignore_on_load_missing = [r"lm_head.weight"]
 
-    def __init__(
-        self, config
-    ):
+    def __init__(self, config):
         super().__init__(config)
         self.num_labels = config.num_labels
         self.context_window_length = config.max_position_embeddings
@@ -1300,7 +1377,9 @@ class LongLlamaForSequenceClassification(LongLlamaPreTrainedModel):
             config.num_labels - 1]`. If `config.num_labels == 1` a regression loss is computed (Mean-Square loss), If
             `config.num_labels > 1` a classification loss is computed (Cross-Entropy).
         """
-        last_context_length = last_context_length if last_context_length is not None else self.config.last_context_length
+        last_context_length = (
+            last_context_length if last_context_length is not None else self.config.last_context_length
+        )
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
         output_hidden_states = (
             output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states

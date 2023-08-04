@@ -2,9 +2,21 @@
 <p align="center" width="100%"><img src="assets/longllama.png" alt="LongLLaMA" style="width: 50%;  display: block; margin: auto;"></p>
 
 # LongLLaMA: Focused Transformer Training for Context Scaling
+
 <div align="center">
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb)
+<table>
+  <tr>
+    <th> <a href="https://huggingface.co/syzymon/long_llama_3b_instruct">LongLLaMA-Instruct-3Bv1.1</a> </th>
+    <th> <a href="https://huggingface.co/syzymon/long_llama_3b_v1_1">LongLLaMA-3Bv1.1</a></th>
+  </tr>
+  <tr>
+    <td align="center">
+    <a  href="https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_instruct_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <td align="center">
+    <a href="https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+ </tr>
+</table>
 
 </div>
 
@@ -17,10 +29,12 @@
 ## TLDR
 This repository contains the research preview of **LongLLaMA, a large language model capable of handling long contexts of 256k tokens or even more**. 
 
-LongLLaMA is built upon the foundation of [OpenLLaMA](https://github.com/openlm-research/open_llama) and fine-tuned using the [Focused Transformer (FoT)](https://arxiv.org/abs/2307.03170) method.  We release a smaller 3B variant of the LongLLaMA model on a permissive license (Apache 2.0) and inference code supporting longer contexts on [Hugging Face](https://huggingface.co/syzymon/long_llama_3b). Our model weights can serve as the drop-in replacement of LLaMA in existing implementations (for short context up to 2048 tokens). Additionally, we provide evaluation results and comparisons against the original OpenLLaMA models. Stay tuned for further updates.
+LongLLaMA is built upon the foundation of [OpenLLaMA](https://github.com/openlm-research/open_llama) and fine-tuned using the [Focused Transformer (FoT)](https://arxiv.org/abs/2307.03170) method.  We release a smaller  3B base variant (not instruction tuned) of the LongLLaMA model on a permissive license (Apache 2.0) and inference code supporting longer contexts on [Hugging Face](https://huggingface.co/syzymon/long_llama_3b). Our model weights can serve as the drop-in replacement of LLaMA in existing implementations (for short context up to 2048 tokens). Additionally, we provide evaluation results and comparisons against the original OpenLLaMA models. Stay tuned for further updates.
 
 
 ## Overview
+
+### Base models
 [Focused Transformer: Contrastive Training for Context Scaling](https://arxiv.org/abs/2307.03170) (FoT) presents a simple method for endowing language models with the ability to handle context consisting possibly of millions of tokens while training on significantly shorter input. FoT permits a subset of attention layers to access a memory cache of (key, value) pairs to extend the context length. The distinctive aspect of FoT is its training procedure, drawing from contrastive learning. Specifically, we deliberately expose the memory attention layers to both relevant and irrelevant keys (like negative samples from unrelated documents). This strategy incentivizes the model to differentiate keys connected with semantically diverse values, thereby enhancing their structure. This, in turn, makes it possible to extrapolate the effective context length much beyond what is seen in training. 
 
 
@@ -29,19 +43,25 @@ with three layers used for context extension. **Crucially, LongLLaMA is able to 
 
 <div align="center">
 
-|  | [LongLLaMA-3B](https://huggingface.co/syzymon/long_llama_3b) | LongLLaMA-7B<br />*(coming soon)*|  LongLLaMA-13B<br />*(coming soon)*|
-|----------------|----------|-----------|-----------|
-| Source model         | [OpenLLaMA-3B](https://huggingface.co/openlm-research/open_llama_3b_easylm)      | -        | - |
-| Source model tokens     | 1T      | -       | - |
-| Fine-tuning tokens  | 10B     | -     | -|
-| Memory layers         |  6, 12, 18        |  -        | -|
+|  | [LongLLaMA-3B](https://huggingface.co/syzymon/long_llama_3b) | [LongLLaMA-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_v1_1) | LongLLaMA-7B<br />*(coming soon)*|  LongLLaMA-13B<br />*(coming soon)*|
+|----------------|----------|----------|-----------|-----------|
+| Source model         | [OpenLLaMA-3B](https://huggingface.co/openlm-research/open_llama_3b_easylm)      | [OpenLLaMA-3Bv2](https://huggingface.co/openlm-research/open_llama_3b_v2_easylm) | -        | - |
+| Source model tokens     | 1T      |  1 T |  -       | - |
+| Fine-tuning tokens  | 10B     | 5B | -     | -|
+| Memory layers         |  6, 12, 18        |   6, 12, 18        |  -        | -|
 
 </div>
+
+### Instruction/Chat tuning
+
+In the [fine_tuning](fine_tuning) subfolder we provide the code that was used to create [LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct), an instruction-tuned version of [LongLLaMA-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_v1_1). We used [OpenOrca](https://huggingface.co/datasets/Open-Orca/OpenOrca) (instructions) and [zetavg/ShareGPT-Processed](https://huggingface.co/datasets/zetavg/ShareGPT-Processed) (chat) datasets for tuning.
 
 
 ## Usage
 
-See also: [Colab with an example usage of LongLLaMA](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb).
+See also: 
+* [Colab with LongLLaMA-Instruct-3Bv1.1](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_instruct_colab.ipynb).
+* [Colab with an example usage of base LongLLaMA](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb).
 ### Requirements
 ```
 pip install --upgrade pip
@@ -53,8 +73,8 @@ pip install transformers==4.30  sentencepiece accelerate
 import torch
 from transformers import LlamaTokenizer, AutoModelForCausalLM
 
-tokenizer = LlamaTokenizer.from_pretrained("syzymon/long_llama_3b")
-model = AutoModelForCausalLM.from_pretrained("syzymon/long_llama_3b", 
+tokenizer = LlamaTokenizer.from_pretrained("syzymon/long_llama_3b_v1_1")
+model = AutoModelForCausalLM.from_pretrained("syzymon/long_llama_3b_v1_1", 
                                             torch_dtype=torch.float32, 
                                             trust_remote_code=True)
 ```
@@ -92,9 +112,9 @@ LongLLaMA has several other parameters:
 import torch
 from transformers import LlamaTokenizer, AutoModelForCausalLM
 
-tokenizer = LlamaTokenizer.from_pretrained("syzymon/long_llama_3b")
+tokenizer = LlamaTokenizer.from_pretrained("syzymon/long_llama_3b_v1_1")
 model = AutoModelForCausalLM.from_pretrained(
-    "syzymon/long_llama_3b", torch_dtype=torch.float32, 
+    "syzymon/long_llama_3b_v1_1", torch_dtype=torch.float32, 
     mem_layers=[], 
     mem_dtype='bfloat16',
     trust_remote_code=True,
@@ -110,8 +130,8 @@ model = AutoModelForCausalLM.from_pretrained(
 from transformers import LlamaTokenizer, LlamaForCausalLM
 import torch
 
-tokenizer = LlamaTokenizer.from_pretrained("syzymon/long_llama_3b")
-model = LlamaForCausalLM.from_pretrained("syzymon/long_llama_3b", torch_dtype=torch.float32)
+tokenizer = LlamaTokenizer.from_pretrained("syzymon/long_llama_3b_v1_1")
+model = LlamaForCausalLM.from_pretrained("syzymon/long_llama_3b_v1_1", torch_dtype=torch.float32)
 ```
 
 
@@ -126,7 +146,7 @@ For simplicity, context extension is realized with a memory cache and full atten
 
 
 ## LongLLaMA performance
-We present some illustrative examples of LongLLaMA results and refer to our paper [Focused Transformer: Contrastive Training for Context Scaling](https://arxiv.org/abs/2307.03170) for more details.
+We present some illustrative examples of LongLLaMA results. Refer to our paper [Focused Transformer: Contrastive Training for Context Scaling](https://arxiv.org/abs/2307.03170) for more details.
 
 We manage to achieve good performance on the passkey retrieval task from [Landmark Attention: Random-Access Infinite Context Length for Transformers](https://arxiv.org/abs/2305.16300). The code for generating the prompt and running the model is located in `examples/passkey.py`. 
 
@@ -178,6 +198,51 @@ on [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) 
 
 </div>
 
+Starting with v1.1 models we have decided to use [EleutherAI](https://github.com/EleutherAI) implementation of [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) wit a slight modification, that adds `<bos>` token at beginning of input sequence. The results are provided in the table below.
+
+<div align="center">
+
+| description            | LongLLaMA-3B | OpenLLaMA-3Bv2 | LongLLaMA-3Bv1.1 | LongLLaMA-Instruct-3Bv1.1 |
+|:-----------------------|:--------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------|:--------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------|
+| anli_r1/acc            | 0.32                                                                                  | 0.33                                                                               | 0.31                                                                      | 0.33                                                                                         |
+| anli_r2/acc            | 0.33                                                                                  | 0.35                                                                               | 0.33                                                                      | 0.35                                                                                         |
+| anli_r3/acc            | 0.35                                                                                  | 0.38                                                                               | 0.35                                                                      | 0.38                                                                                         |
+| arc_challenge/acc      | 0.34                                                                                  | 0.33                                                                               | 0.32                                                                      | 0.36                                                                                         |
+| arc_challenge/acc_norm | 0.37                                                                                  | 0.36                                                                               | 0.36                                                                      | 0.37                                                                                         |
+| arc_easy/acc           | 0.67                                                                                  | 0.68                                                                               | 0.68                                                                      | 0.7                                                                                          |
+| arc_easy/acc_norm      | 0.63                                                                                  | 0.63                                                                               | 0.63                                                                      | 0.63                                                                                         |
+| boolq/acc              | 0.68                                                                                  | 0.67                                                                               | 0.66                                                                      | 0.77                                                                                         |
+| hellaswag/acc          | 0.48                                                                                  | 0.53                                                                               | 0.52                                                                      | 0.52                                                                                         |
+| hellaswag/acc_norm     | 0.65                                                                                  | 0.7                                                                                | 0.69                                                                      | 0.68                                                                                         |
+| openbookqa/acc         | 0.28                                                                                  | 0.28                                                                               | 0.28                                                                      | 0.28                                                                                         |
+| openbookqa/acc_norm    | 0.38                                                                                  | 0.39                                                                               | 0.37                                                                      | 0.41                                                                                         |
+| piqa/acc               | 0.73                                                                                  | 0.77                                                                               | 0.77                                                                      | 0.78                                                                                         |
+| piqa/acc_norm          | 0.75                                                                                  | 0.78                                                                               | 0.77                                                                      | 0.77                                                                                         |
+| record/em              | 0.87                                                                                  | 0.87                                                                               | 0.86                                                                      | 0.85                                                                                         |
+| record/f1              | 0.88                                                                                  | 0.88                                                                               | 0.87                                                                      | 0.86                                                                                         |
+| rte/acc                | 0.6                                                                                   | 0.53                                                                               | 0.62                                                                      | 0.7                                                                                          |
+| truthfulqa_mc/mc1      | 0.24                                                                                  | 0.22                                                                               | 0.21                                                                      | 0.25                                                                                         |
+| truthfulqa_mc/mc2      | 0.38                                                                                  | 0.35                                                                               | 0.35                                                                      | 0.4                                                                                          |
+| wic/acc                | 0.5                                                                                   | 0.5                                                                                | 0.5                                                                       | 0.54                                                                                         |
+| winogrande/acc         | 0.6                                                                                   | 0.66                                                                               | 0.63                                                                      | 0.65                                                                                         |
+| Avg score                   | 0.53                                                                                  | 0.53                                                                               | 0.53                                                                      | 0.55                                                                                         |
+
+</div>
+
+
+We also provide the results on human-eval. We cut the generated text after either
+*  `"\ndef "`
+*  `"\nclass "`
+*  `"\nif __name__"`
+
+<div align="center">
+
+|  | OpenLLaMA-3Bv2 | LongLLaMA-3Bv1.1 | LongLLaMA-Instruct-3Bv1.1 |
+| - | - | - | - |
+| pass@1| 0.09| 0.12 |  0.12 |
+
+</div>
+
 ## Authors
 - [Szymon Tworkowski](https://scholar.google.com/citations?user=1V8AeXYAAAAJ&hl=en)
 - [Konrad Staniszewski](https://scholar.google.com/citations?user=CM6PCBYAAAAJ)
@@ -202,7 +267,8 @@ To cite this work please use
 
 
 ## License
-The code and checkpoints are licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+The code and base models checkpoints are licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).  
+The instruction/chat tuned models are for research purposes only.  
 Some of the examples use external code (see headers of files for copyright notices and licenses).
 
 ## Acknowledgments
