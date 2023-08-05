@@ -2,13 +2,21 @@
 
 <div align="center">
 
-<span style="padding: 1px;">[LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct)</span> 
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_instruct_colab.ipynb)
+<table>
+  <tr>
+    <th> <a href="https://huggingface.co/syzymon/long_llama_3b_instruct">LongLLaMA-Instruct-3Bv1.1</a> </th>
+  </tr>
+  <tr>
+    <td align="center">
+    <a  href="https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_instruct_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    </td>
+ </tr>
+</table>
 
 </div>
 
-This catalog contains code for instruction/chat tuning of the LongLLaMA models. Using this code we managed to tune the [LongLLaMA-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_v1_1) using one A100 80GB GPU in 44 hours. For tuning, we used [OpenOrca](https://huggingface.co/datasets/Open-Orca/OpenOrca) (instructions) and [zetavg/ShareGPT-Processed](https://huggingface.co/datasets/zetavg/ShareGPT-Processed) (chat) datasets. We call the created model [LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct). We provide a colab demo of the model [here](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_instruct_colab.ipynb).
+This catalog contains code for instruction/chat tuning of the LongLLaMA models. Using this code we managed to tune the [LongLLaMA-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_v1_1) using one A100 80GB GPU in 44 hours. For tuning, we used [OpenOrca](https://huggingface.co/datasets/Open-Orca/OpenOrca) (instructions) and [zetavg/ShareGPT-Processed](https://huggingface.co/datasets/zetavg/ShareGPT-Processed) (chat) datasets. We call the created model [LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct). We provide a [Colab demo of the model](https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_instruct_colab.ipynb).
  
 For more about LongLLaMA see the paper [Focused Transformer: Contrastive Training for Context Scaling](https://arxiv.org/abs/2307.03170).  
 
@@ -31,13 +39,13 @@ For example, to create your own [LongLLaMA-Instruct-3Bv1.1](https://huggingface.
 
 ## Licensing
 The code is available under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).  
-Note that for fine-tunig we used [OpenOrca](https://huggingface.co/datasets/Open-Orca/OpenOrca) and [zetavg/ShareGPT-Processed](https://huggingface.co/datasets/zetavg/ShareGPT-Processed) datasets. Those datasets contain outputs of GPT models, what can affect the licensing of the models trained on them.
+Note that for fine-tuning we used [OpenOrca](https://huggingface.co/datasets/Open-Orca/OpenOrca) and [zetavg/ShareGPT-Processed](https://huggingface.co/datasets/zetavg/ShareGPT-Processed) datasets. Those datasets contain outputs of GPT models, which can affect the licensing of the models trained on them.
 
 ## Misc
 
-Note that the fine-tuning shell scripts are for models previously fine-tuned with [FoT](https://arxiv.org/abs/2307.03170). In particular, we do not use the FoT method during instruction fine-tuning. In order to maintain the model's ability to utilize long context, we randomly decide for short inputs how much data will be loaded to memory and how much will stay in the last context window. We achieve this by randomly padding the input.
+Note that the fine-tuning scripts are for models previously fine-tuned with [FoT](https://arxiv.org/abs/2307.03170). In particular, we do not use the FoT method during instruction fine-tuning. In order to maintain the model's ability to utilize long context, we randomly decide (for short inputs) how much data will be loaded to memory and how much will stay in the last context window. We achieve this by randomly padding the input.
 
-Sometimes Hugging Face Trainer can pick the logger by default. If you run into problems with this you can manually set the logger for example by adding `--report_to "tensorboard"` inside the script.  
+Sometimes Hugging Face Trainer can pick the logger by default. If you run into problems, you can manually set the logger by adding `--report_to "tensorboard"` inside the script.  
 
 If you plan to use this codebase for different models, please note how the padding is applied. Note also that attention is masked for padding tokens. 
 

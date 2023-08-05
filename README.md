@@ -13,8 +13,10 @@
   <tr>
     <td align="center">
     <a  href="https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_instruct_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    </td>
     <td align="center">
     <a href="https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    </td>
  </tr>
 </table>
 
