@@ -17,7 +17,7 @@ For more about LongLLaMA see the paper [Focused Transformer: Contrastive Trainin
 Required packages are located in `requirements.txt`.  
 Example configs are in files:
 * [example_inst_ft_3b_low_budget.sh](example_inst_ft_3b_low_budget.sh) - only instruction tuning, smaller context
-* [example_instchat_ft_3bv1.1_low_budget.sh](example_instchat_ft_3bv1.1_low_budget.sh) - instruction and chat tuning, config used for [LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct)
+* [example_instchat_ft_3bv1.1_low_budget.sh](example_instchat_ft_3bv1.1_low_budget.sh) - instruction and chat tuning, config used for [LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct). The chat prompt was inspired by [LongChat](https://github.com/DachengLi1/LongChat).
 
 To tune the model, simply run one of the scripts from the repo root directory. To manage the tuning process we use [Hugging Face trainer](https://huggingface.co/docs/transformers/v4.30.0/en/main_classes/trainer).  
 For example, to create your own [LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct) run `./fine_tuning/example_instchat_ft_3bv1.1_low_budget.sh`.
