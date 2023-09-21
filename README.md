@@ -115,7 +115,7 @@ See also:
 ### Requirements
 ```
 pip install --upgrade pip
-pip install transformers==4.30  sentencepiece accelerate
+pip install transformers==4.33.2 sentencepiece accelerate
 ```
 
 ### Loading model
