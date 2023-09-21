@@ -318,7 +318,7 @@ def main(argv):
 
                 should_run_eval = FLAGS.eval_freq > 0 and FLAGS.eval_steps > 0 and substep == 0 and (step % FLAGS.eval_freq == 0 or first_step) 
 
-                should_log_train = step % FLAGS.train_log_freq == 0 and substep == 0 # TODO change to train_substeps
+                should_log_train = step % FLAGS.train_log_freq == 0 and substep == 0
 
                 if should_run_eval:
                     defragment()
