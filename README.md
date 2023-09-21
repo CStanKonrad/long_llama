@@ -217,7 +217,15 @@ Our LongLLaMA 3B model also shows improvements when using long context on two do
 
 </div>
 
-LongLLaMA retains performance on tasks that do not require long context. We provide a comparison with OpenLLaMA
+LongLLaMA retains performance on tasks that do not require long context. 
+
+In particular, LongLLaMA-Code 7B improves reasoning (GSM8K) and knowledge (MMLU) due to code fine-tuning:
+
+<p align="center" width="100%">
+<img src="assets/full_results.png" alt="LongLLaMA" style="width: 70%; min-width: 300px; display: block; margin: auto;">
+</p>
+
+We provide a comparison with OpenLLaMA
 on [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) in the zero-shot setting. 
 <div align="center">
 
@@ -324,5 +332,7 @@ Some of the examples use external code (see headers of files for copyright notic
 
 ## Acknowledgments
 We gratefully acknowledge the TPU Research Cloud program, which was instrumental to our research by providing significant computational resources. We are also grateful to Xinyang Geng and Hao Liu for releasing [OpenLLaMA](https://github.com/openlm-research/open_llama) checkpoints and the [EasyLM](https://github.com/young-geng/EasyLM) library.
+
+Special thanks to [Keiran Paster](https://twitter.com/keirp1) for providing immensely valuable suggestions about the pre-training data for LongLLaMA-Code.
 
 We would like to thank [Xiaosong,He](https://github.com/hxs91) for suggestions on how to improve the explanations of cross-batch code.
