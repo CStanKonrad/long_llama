@@ -3,6 +3,36 @@
 
 # LongLLaMA: Focused Transformer Training for Context Scaling
 
+
+<div align="center">
+
+
+
+
+
+<table>
+
+  <tr>
+  <td align="center">
+    <span style="font-size:300%">{</span>
+    </td>
+    <td align="center">
+    <span style="font-size:115%">
+    <b>
+    <a href="https://huggingface.co/syzymon/long_llama_code_7b" tyle="margin-bottom:30px">LongLLaMA Code-7B</a>
+    </b>
+    </span>
+    </td>
+    <td align="center">
+    <span style="font-size:300%">}</span>
+    </td>
+
+ </tr>
+</table>
+
+
+</div>
+
 <div align="center">
 
 <table>
@@ -25,13 +55,18 @@
 <div align="center">
 
  [TLDR](#TLDR) | [Overview](#Overview) | [Usage](#Usage) | [LongLLaMA performance](#LongLLaMA-performance) | [Authors](#Authors) | [Citation](#Citation) | [License](#License) | [Acknowledgments](#Acknowledgments)
+ 
+ [FoT continued pretraining](fot_continued_pretraining) | [Instruction tuning](instruction_fine_tuning)
 
 </div>
 
 ## TLDR
 This repository contains the research preview of **LongLLaMA, a large language model capable of handling long contexts of 256k tokens or even more**. 
 
-LongLLaMA is built upon the foundation of [OpenLLaMA](https://github.com/openlm-research/open_llama) and fine-tuned using the [Focused Transformer (FoT)](https://arxiv.org/abs/2307.03170) method.  We release a smaller  3B base variant (not instruction tuned) of the LongLLaMA model on a permissive license (Apache 2.0) and inference code supporting longer contexts on [Hugging Face](https://huggingface.co/syzymon/long_llama_3b). Our model weights can serve as the drop-in replacement of LLaMA in existing implementations (for short context up to 2048 tokens). Additionally, we provide evaluation results and comparisons against the original OpenLLaMA models. Stay tuned for further updates.
+LongLLaMA is built upon the foundation of [OpenLLaMA](https://github.com/openlm-research/open_llama) and fine-tuned using the [Focused Transformer (FoT)](https://arxiv.org/abs/2307.03170) method.
+LongLLaMA Code is built upon the foundation of [Code Llama](https://huggingface.co/codellama/CodeLlama-7b-hf).
+We release a smaller  3B base variant (not instruction tuned) of the LongLLaMA model on a permissive license (Apache 2.0) and inference code supporting longer contexts on [Hugging Face](https://huggingface.co/syzymon/long_llama_3b). Our model weights can serve as the drop-in replacement of LLaMA in existing implementations (for short context up to 2048 tokens). Additionally, we provide evaluation results and comparisons against the original OpenLLaMA models.  
+In addition to this, we release code for [instruction tuning (PyTorch)](instruction_fine_tuning/) and [FoT continued pretraining (JAX)](fot_continued_pretraining/).
 
 
 ## Overview
@@ -41,22 +76,35 @@ LongLLaMA is built upon the foundation of [OpenLLaMA](https://github.com/openlm-
 
 
 **LongLLaMA** is an [OpenLLaMA](https://github.com/openlm-research/open_llama) model finetuned with the FoT method,
-with three layers used for context extension. **Crucially, LongLLaMA is able to extrapolate much beyond the context length seen in training: $8k$. E.g., in the passkey retrieval task, it can handle inputs of length $256k$**.
+with three layers used for context extension. **Crucially, LongLLaMA is able to extrapolate much beyond the context length seen in training: $8k$. E.g., in the passkey retrieval task, it can handle inputs of length $256k$**.  
+**LongLLaMA Code** is a [Code Llama](https://huggingface.co/codellama/CodeLlama-7b-hf) model finetuned with the FoT method.
+
 
 <div align="center">
 
-|  | [LongLLaMA-3B](https://huggingface.co/syzymon/long_llama_3b) | [LongLLaMA-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_v1_1) | LongLLaMA-7B<br />*(coming soon)*|  LongLLaMA-13B<br />*(coming soon)*|
-|----------------|----------|----------|-----------|-----------|
-| Source model         | [OpenLLaMA-3B](https://huggingface.co/openlm-research/open_llama_3b_easylm)      | [OpenLLaMA-3Bv2](https://huggingface.co/openlm-research/open_llama_3b_v2_easylm) | -        | - |
-| Source model tokens     | 1T      |  1 T |  -       | - |
-| Fine-tuning tokens  | 10B     | 5B | -     | -|
-| Memory layers         |  6, 12, 18        |   6, 12, 18        |  -        | -|
+|  | [LongLLaMA-3B](https://huggingface.co/syzymon/long_llama_3b) | [LongLLaMA-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_v1_1) | [LongLLaMA Code-7B](https://huggingface.co/syzymon/long_llama_code_7b) |
+|----------------|----------|----------|-----------|
+| Source model         | [OpenLLaMA-3B](https://huggingface.co/openlm-research/open_llama_3b_easylm)      | [OpenLLaMA-3Bv2](https://huggingface.co/openlm-research/open_llama_3b_v2_easylm) | [CodeLLaMA-7b-hf](https://huggingface.co/codellama/CodeLlama-7b-hf)       |
+| Source model tokens     | 1T      |  1 T |  2T + 0.5 T       |
+| Fine-tuning tokens  | 10B     | 5B | 35B     | - |
+| Memory layers         |  6, 12, 18        |   6, 12, 18        |  8, 16, 24        |
 
 </div>
 
+
+### FoT continued pretraining
+In the [fot_continued_pretraining](fot_continued_pretraining/) subfolder, we provide the code that can be used to tune LLaMA models with FoT.  
+This code is written in [JAX](https://jax.readthedocs.io/en/latest/notebooks/quickstart.html) & [Flax](https://flax.readthedocs.io/en/latest/guides/flax_basics.html) and based on [EasyLM](https://github.com/young-geng/EasyLM).
+
 ### Instruction/Chat tuning
 
-In the [fine_tuning](fine_tuning) subfolder we provide the code that was used to create [LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct), an instruction-tuned version of [LongLLaMA-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_v1_1). We used [OpenOrca](https://huggingface.co/datasets/Open-Orca/OpenOrca) (instructions) and [zetavg/ShareGPT-Processed](https://huggingface.co/datasets/zetavg/ShareGPT-Processed) (chat) datasets for tuning.
+In the [instruction_fine_tuning](instruction_fine_tuning/) subfolder, we provide the code that was used to create [LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct), an instruction-tuned version of [LongLLaMA-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_v1_1). We used [OpenOrca](https://huggingface.co/datasets/Open-Orca/OpenOrca) (instructions) and [zetavg/ShareGPT-Processed](https://huggingface.co/datasets/zetavg/ShareGPT-Processed) (chat) datasets for tuning.  
+This code utilizes [PyTorch](https://pytorch.org/) and [Hugging Face trainer](https://huggingface.co/docs/transformers/v4.30.0/en/main_classes/trainer).
+
+### Inference code
+In the [src](src/) subfolder we provide inference code for FoT models.  
+The code is written in [PyTorch](https://pytorch.org/) and based on [Hugging Face implementation of LLaMA](https://huggingface.co/docs/transformers/main/model_doc/llama).  
+The code should support standard Hugging Face API. For more details see the [Usage](#Usage) section.
 
 
 ## Usage
@@ -138,7 +186,7 @@ model = LlamaForCausalLM.from_pretrained("syzymon/long_llama_3b_v1_1", torch_dty
 
 
 ### How LongLLaMA handles long inputs
-Inputs over $2048$ tokens are automatically split into windows $w_1, \ldots, w_m$. The first $m-2$ windows contain $2048$ tokens each, $w_{m-1}$ has no more than $2048$ tokens, and $w_m$ contains the number of tokens specified by `last_context_length`. The model processes the windows one by one extending the memory cache after each. If `use_cache` is `True`, the last window will not be loaded to the memory cache but to the local (generation) cache.
+Inputs over $2048$ tokens are automatically split into windows $w_1, \ldots, w_m$. The first $m-2$ windows contain $2048$ tokens each, $w_{m-1}$ has no more than $2048$ tokens, and $w_m$ contains the number of tokens specified by `last_context_length`. The model processes the windows one by one extending the memory cache after each. If `use_cache` is `True`, then the last window will not be loaded to the memory cache but to the local (generation) cache.
 
 The memory cache stores $(key, value)$ pairs for each head of the specified memory layers `mem_layers`. In addition to this, it stores attention masks. 
 
@@ -269,9 +317,12 @@ To cite this work please use
 
 
 ## License
-The code and base models checkpoints are licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).  
+The source code and base LongLLaMA 3B models checkpoints are licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).  
 The instruction/chat tuned models are for research purposes only.  
+For the LongLLaMA Code see [codellama/CodeLlama-7b-hf](https://huggingface.co/codellama/CodeLlama-7b-hf/blob/main/LICENSE) license.  
 Some of the examples use external code (see headers of files for copyright notices and licenses).
 
 ## Acknowledgments
 We gratefully acknowledge the TPU Research Cloud program, which was instrumental to our research by providing significant computational resources. We are also grateful to Xinyang Geng and Hao Liu for releasing [OpenLLaMA](https://github.com/openlm-research/open_llama) checkpoints and the [EasyLM](https://github.com/young-geng/EasyLM) library.
+
+We would like to thank [Xiaosong,He](https://github.com/hxs91) for suggestions on how to improve the explanations of cross-batch code.

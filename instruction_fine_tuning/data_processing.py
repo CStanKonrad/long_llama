@@ -1,5 +1,5 @@
 import copy
-import enum
+import json
 import logging
 import re
 import sys
@@ -10,7 +10,7 @@ import torch
 from datasets import load_dataset
 from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizer
-
+import functools
 from .arguments import *
 
 LOGGER = logging.Logger("Data Processing", level=logging.INFO)
@@ -288,6 +288,63 @@ def separate_data_args(data_args: DataArgs) -> List[DataArgs]:
     revisions = data_args.data_revision.split(",")
     data_splits = data_args.dataset_split.split(",")
 
+    def split_field(field: Optional[str], dataset_type: str, separator: str, process_field_name_fn):
+        if field is None:
+            return [None] * num_datasets
+        else:
+            field_list = field.split(separator)
+            if len(field_list) == 1:
+                LOGGER.info(f"Broadcastin used for {dataset_type} fields {field_list}.")
+                field_list_getter = lambda _: field_list[0]
+            else:
+                field_list_getter = lambda x: field_list[x]
+            result = []
+            appended = 0
+            for dt in data_types:
+                if dt == dataset_type:
+                    converted_field_data = process_field_name_fn(field_list_getter(appended))
+                    result.append(converted_field_data)
+                    appended += 1
+                else:
+                    result.append(None)
+            return result
+
+    def none_str_to_none(x):
+        if x == "None":
+            return None
+        else:
+            return x
+
+    split_basic_instruct_field = functools.partial(
+        split_field, dataset_type="instructions", separator=",", process_field_name_fn=none_str_to_none
+    )
+
+    prompt_fields = split_basic_instruct_field(data_args.prompt_field)
+    question_fields = split_basic_instruct_field(data_args.question_field)
+    response_fields = split_basic_instruct_field(data_args.response_field)
+
+    split_adv_instruct_field = functools.partial(
+        split_field, dataset_type="instructions", separator="<,>", process_field_name_fn=lambda x: x
+    )
+
+    pre_prompt_texts = split_adv_instruct_field(data_args.pre_prompt_text)
+    post_prompt_texts = split_adv_instruct_field(data_args.post_prompt_text)
+
+    pre_question_texts = split_adv_instruct_field(data_args.pre_question_text)
+    post_question_texts = split_adv_instruct_field(data_args.post_question_text)
+
+    pre_response_texts = split_adv_instruct_field(data_args.pre_response_text)
+    post_response_texts = split_adv_instruct_field(data_args.post_response_text)
+
+    split_basic_chat_field = functools.partial(
+        split_field, dataset_type="chat", separator=",", process_field_name_fn=none_str_to_none
+    )
+
+    chat_conversations_fields = split_basic_chat_field(data_args.chat_conversations_field)
+    chat_data_fields = split_basic_chat_field(data_args.chat_data_field)
+    chat_source_name_fields = split_basic_chat_field(data_args.chat_source_name_field)
+    chat_model_source_names = split_basic_chat_field(data_args.chat_model_source_name)
+
     if data_args.data_filter is None:
         data_filters = [None for _ in range(num_datasets)]
     else:
@@ -326,6 +383,24 @@ def separate_data_args(data_args: DataArgs) -> List[DataArgs]:
         d_args.dataset_split = data_splits[d_id]
         d_args.data_proportions = data_proportions[d_id]
         d_args.data_filter = data_filters[d_id]
+
+        d_args.prompt_field = prompt_fields[d_id]
+        d_args.question_field = question_fields[d_id]
+        d_args.response_field = response_fields[d_id]
+
+        d_args.pre_prompt_text = pre_prompt_texts[d_id]
+        d_args.post_prompt_text = post_prompt_texts[d_id]
+
+        d_args.pre_question_text = pre_question_texts[d_id]
+        d_args.post_question_text = post_question_texts[d_id]
+
+        d_args.pre_response_text = pre_response_texts[d_id]
+        d_args.post_response_text = post_response_texts[d_id]
+
+        d_args.chat_conversations_field = chat_conversations_fields[d_id]
+        d_args.chat_data_field = chat_data_fields[d_id]
+        d_args.chat_source_name_field = chat_source_name_fields[d_id]
+        d_args.chat_model_source_name = chat_model_source_names[d_id]
         splitted_data_args.append(d_args)
 
     return splitted_data_args
@@ -514,6 +589,58 @@ class SingleTuneDataset(Dataset):
         )
 
 
+@dataclass
+class DatasetProcessingStats:
+    ds_name: str
+    padding_token_id: int = 0
+    processed_tokens: int = 0
+    processed_loss_tokens: int = 0
+    number_of_get_calls: int = 0
+
+    def update(self, data: Dict[str, Any]):
+        def convert_to_numpy(x):
+            if isinstance(x, np.ndarray):
+                return x
+            elif isinstance(x, torch.tensor):
+                return x.numpy()
+            else:
+                raise ValueError("DatasetProcessingStats: Type not supported")
+
+        input_ids = convert_to_numpy(data["input_ids"])
+        labels = convert_to_numpy(data["labels"])
+
+        self.processed_tokens += (
+            np.logical_and(input_ids != self.padding_token_id, input_ids != IGNORE_INDEX).astype(np.int64).sum().item()
+        )
+        self.processed_loss_tokens += (
+            np.logical_and(labels != self.padding_token_id, labels != IGNORE_INDEX).astype(np.int64).sum().item()
+        )
+        self.number_of_get_calls += 1
+
+
+def show_data_stats(data_stats: List[DatasetProcessingStats]):
+    total_proc_tokens = 0
+    total_proc_loss_tokens = 0
+    total_get_calls = 0
+    for ds in data_stats:
+        total_proc_tokens += ds.processed_tokens
+        total_proc_loss_tokens += ds.processed_loss_tokens
+        total_get_calls += ds.number_of_get_calls
+
+    result = {}
+    for ds in data_stats:
+        result[ds.ds_name] = {
+            "processed_tokens": ds.processed_tokens,
+            "processed_tokens%": 100.0 * ds.processed_tokens / max(total_proc_tokens, 1),
+            "processed_loss_tokens": ds.processed_loss_tokens,
+            "processed_loss_tokens%": 100.0 * ds.processed_loss_tokens / max(total_proc_loss_tokens, 1),
+            "get_calls": ds.number_of_get_calls,
+            "get_calls%": ds.number_of_get_calls / max(total_get_calls, 1),
+        }
+
+    return json.dumps(result, indent=2)
+
+
 class MixedTuneDataset(Dataset):
     def __init__(
         self,
@@ -522,6 +649,7 @@ class MixedTuneDataset(Dataset):
         tokenization_args: TokenizationArgs,
         return_pt: bool = True,
         mix_seed=42,
+        log_stats=False,
     ):
         self.org_data_args = data_args
         self.tokenizer = tokenizer
@@ -544,6 +672,17 @@ class MixedTuneDataset(Dataset):
         self.total_length = total_length
         LOGGER.info(f"Cumulative dataset size is {self.total_length}")
 
+        if log_stats:
+            self.per_dataset_stats = [
+                DatasetProcessingStats(
+                    ds_name=f"ds{ds_id}={ds.data_args.data_path}",
+                    padding_token_id=get_padding_token(tokenizer=tokenizer),
+                )
+                for ds_id, ds in enumerate(self.datasets)
+            ]
+        else:
+            self.per_dataset_stats = None
+
         ds_indices = np.arange(len(self.datasets), dtype=np.int32)
         if len(ds_indices) > 1:
             rnd_state = np.random.get_state()
@@ -563,7 +702,13 @@ class MixedTuneDataset(Dataset):
         ds_id = self.mapping[i]
         ds = self.datasets[ds_id]
         i = i % len(ds)
-        return ds[i]
+        result = ds[i]
+
+        if self.per_dataset_stats is not None:
+            self.per_dataset_stats[ds_id].update(result)
+            LOGGER.info(show_data_stats(self.per_dataset_stats))
+
+        return result
 
 
 class DataCollator:

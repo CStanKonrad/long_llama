@@ -1,6 +1,6 @@
 #!/bin/bash
 EXP_NAME="example_instchat_ft_3bv1.1_low_budget"
-python3 -m fine_tuning.fine_tuning \
+python3 -m instruction_fine_tuning.fine_tuning \
     --run_name "$EXP_NAME" \
     --output_dir "$EXP_NAME"/ \
     --model_path "syzymon/long_llama_3b_v1_1" \

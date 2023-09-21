@@ -28,7 +28,7 @@ Example configs are in files:
 * [example_instchat_ft_3bv1.1_low_budget.sh](example_instchat_ft_3bv1.1_low_budget.sh) - instruction and chat tuning, config used for [LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct), the chat prompt was inspired by [LongChat](https://github.com/DachengLi1/LongChat)
 
 To tune the model, simply run one of the scripts from the repo root directory. To manage the tuning process we use [Hugging Face trainer](https://huggingface.co/docs/transformers/v4.30.0/en/main_classes/trainer).  
-For example, to create your own [LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct) run `./fine_tuning/example_instchat_ft_3bv1.1_low_budget.sh`.
+For example, to create your own [LongLLaMA-Instruct-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_instruct) run `./instruction_fine_tuning/example_instchat_ft_3bv1.1_low_budget.sh`.
 
 ## Brief description of files
 * [arguments.py](arguments.py) - see this file for the description of additional (non-Hugging Face) parameters
@@ -43,7 +43,7 @@ Note that for fine-tuning we used [OpenOrca](https://huggingface.co/datasets/Ope
 
 ## Misc
 
-Note that the fine-tuning scripts are for models previously fine-tuned with [FoT](https://arxiv.org/abs/2307.03170). In particular, we do not use the FoT method during instruction fine-tuning. In order to maintain the model's ability to utilize long context, we randomly decide (for short inputs) how much data will be loaded to memory and how much will stay in the last context window. We achieve this by randomly padding the input.
+Note that the fine-tuning scripts are for models previously fine-tuned with [FoT](https://arxiv.org/abs/2307.03170). In particular, we do not use the FoT method during instruction fine-tuning. In order to maintain the model's ability to utilize long context, we randomly decide (for short inputs) how much data will be loaded to memory and how much will stay in the last context window. We achieve this by randomly padding the input. One may think of this as a modified version of FoT without negatives and with only current and previous context.
 
 Sometimes Hugging Face Trainer can pick the logger by default. If you run into problems, you can manually set the logger by adding `--report_to "tensorboard"` inside the script.  
 

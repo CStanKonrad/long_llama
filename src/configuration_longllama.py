@@ -115,6 +115,8 @@ class LongLlamaConfig(PretrainedConfig):
         bos_token_id=1,
         eos_token_id=2,
         tie_word_embeddings=False,
+        rope_theta=10000.0,
+        rope_scaling=None,
         last_context_length=1024,
         mem_layers=[],
         mem_positionals=True,
@@ -134,6 +136,8 @@ class LongLlamaConfig(PretrainedConfig):
         self.initializer_range = initializer_range
         self.rms_norm_eps = rms_norm_eps
         self.use_cache = use_cache
+        self.rope_theta = rope_theta
+        self.rope_scaling = rope_scaling
         self.last_context_length = last_context_length
         self.mem_layers = mem_layers
         self.mem_positionals = mem_positionals
@@ -141,6 +145,8 @@ class LongLlamaConfig(PretrainedConfig):
         self.mem_attention_grouping = mem_attention_grouping
         self.torch_attention = torch_attention
         self.gradient_checkpoint_every_ith = gradient_checkpoint_every_ith
+
+        self._rope_scaling_validation()
         super().__init__(
             pad_token_id=pad_token_id,
             bos_token_id=bos_token_id,
@@ -148,3 +154,10 @@ class LongLlamaConfig(PretrainedConfig):
             tie_word_embeddings=tie_word_embeddings,
             **kwargs,
         )
+
+    def _rope_scaling_validation(self):
+        """
+        Validate the `rope_scaling` configuration.
+        """
+        if self.rope_scaling is not None:
+            raise ValueError("LongLLaMA does not use rope_scaling")
