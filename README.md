@@ -19,7 +19,7 @@
     <td align="center">
     <span style="font-size:115%">
     <b>
-    <a href="https://huggingface.co/syzymon/long_llama_code_7b" tyle="margin-bottom:30px">LongLLaMA Code-7B</a>
+    <a href="https://huggingface.co/syzymon/long_llama_code_7b" tyle="margin-bottom:30px">LongLLaMA-Code 7B</a>
     </b>
     </span>
     </td>
@@ -82,7 +82,7 @@ with three layers used for context extension. **Crucially, LongLLaMA is able to 
 
 <div align="center">
 
-|  | [LongLLaMA-3B](https://huggingface.co/syzymon/long_llama_3b) | [LongLLaMA-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_v1_1) | [LongLLaMA Code-7B](https://huggingface.co/syzymon/long_llama_code_7b) |
+|  | [LongLLaMA-3B](https://huggingface.co/syzymon/long_llama_3b) | [LongLLaMA-3Bv1.1](https://huggingface.co/syzymon/long_llama_3b_v1_1) | [LongLLaMA-Code 7B](https://huggingface.co/syzymon/long_llama_code_7b) |
 |----------------|----------|----------|-----------|
 | Source model         | [OpenLLaMA-3B](https://huggingface.co/openlm-research/open_llama_3b_easylm)      | [OpenLLaMA-3Bv2](https://huggingface.co/openlm-research/open_llama_3b_v2_easylm) | [CodeLLaMA-7b-hf](https://huggingface.co/codellama/CodeLlama-7b-hf)       |
 | Source model tokens     | 1T      |  1 T |  2T + 0.5 T       |
