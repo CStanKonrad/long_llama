@@ -39,32 +39,6 @@ from FoT.cross_batch import cross_batch_attention
 import functools
 
 LLAMA_STANDARD_CONFIGS = {
-    "150m_fot": {
-        "vocab_size": 32000,
-        "hidden_size": 1024,
-        "intermediate_size": 4096,
-        "num_hidden_layers": 12,
-        "num_attention_heads": 8,
-        "max_sequence_length": 4096,
-        "initializer_range": 0.02,
-        'mem_layers': [8],
-        "rms_norm_eps": 1e-6,
-        "use_cache": True,
-        "tie_word_embeddings": False,
-    },
-    "150m_fot69": {
-        "vocab_size": 32000,
-        "hidden_size": 1024,
-        "intermediate_size": 4096,
-        "num_hidden_layers": 12,
-        "num_attention_heads": 8,
-        "max_sequence_length": 4096,
-        "initializer_range": 0.02,
-        'mem_layers': [6, 9],
-        "rms_norm_eps": 1e-6,
-        "use_cache": True,
-        "tie_word_embeddings": False,
-    },
     '1b': {
         'vocab_size': 32000,
         'hidden_size': 2048,
@@ -89,6 +63,19 @@ LLAMA_STANDARD_CONFIGS = {
         'use_cache': True,
         'tie_word_embeddings': False,
     },
+    "3b_FoT": {
+        "vocab_size": 32000,
+        "hidden_size": 3200,
+        "intermediate_size": 8640,
+        "num_hidden_layers": 26,
+        "num_attention_heads": 32,
+        "max_sequence_length": 2048,
+        "initializer_range": 0.02,
+        "rms_norm_eps": 1e-6,
+        "use_cache": True,
+        "tie_word_embeddings": False,
+        "mem_layers": [6, 12, 18],
+    },
     '7b': {
         'vocab_size': 32000,
         'hidden_size': 4096,
@@ -100,6 +87,20 @@ LLAMA_STANDARD_CONFIGS = {
         'rms_norm_eps': 1e-6,
         'use_cache': True,
         'tie_word_embeddings': False,
+    },
+    "7b_FoT": {
+        "vocab_size": 32016,
+        "hidden_size": 4096,
+        "intermediate_size": 11008,
+        "num_hidden_layers": 32,
+        "num_attention_heads": 32,
+        "max_sequence_length": 4096,
+        "initializer_range": 0.02,
+        "rms_norm_eps": 1e-6,
+        "use_cache": True,
+        "tie_word_embeddings": False,
+        "mem_layers": [8, 16, 24],
+        "rope_theta": 1_000_000.0
     },
     '13b': {
         'vocab_size': 32000,
