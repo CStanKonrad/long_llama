@@ -4,34 +4,64 @@
 # LongLLaMA: Focused Transformer Training for Context Scaling
 
 
+
 <div align="center">
 
+<table>
+  <tr>
+    <th style="font-size: 120%"> >_ 🎓 <a href="https://huggingface.co/syzymon/long_llama_code_7b_instruct">LongLLaMA-Code 7B Instruct</a> 📑🗨 </th>
+  </tr>
+  <tr>
+    <td align="center">
+    <a  href="https://colab.research.google.com/github/CStanKonrad/long_llama/blob/main/long_llama_code_instruct_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a> &nbsp <a href="instruction_fine_tuning/LongLLamaCode7BInstruct.md">Learn more</a>
+    </td>
+    
+ </tr>
+</table>
+
+</div>
 
 
-
+<div align="center">
 
 <table>
 
   <tr>
   <td align="center">
-    <span style="font-size:300%">{</span>
+    <span style="font-size:200%">⇧</span>
+  </td>
+ </tr>
+ 
+</table>
+
+</div>
+
+<div align="center">
+
+<table>
+
+  <tr>
+  <td align="center">
+    <span style="font-size:150%">{</span>
     </td>
     <td align="center">
-    <span style="font-size:115%">
+    <span style="font-size:110%">
     <b>
     <a href="https://huggingface.co/syzymon/long_llama_code_7b" tyle="margin-bottom:30px">LongLLaMA-Code 7B</a>
     </b>
     </span>
     </td>
     <td align="center">
-    <span style="font-size:300%">}</span>
+    <span style="font-size:150%">}</span>
     </td>
 
  </tr>
 </table>
 
+<hr>
 
 </div>
+
 
 <div align="center">
 
@@ -327,7 +357,8 @@ To cite this work please use
 ## License
 The source code and base LongLLaMA 3B models checkpoints are licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).  
 The instruction/chat tuned models are for research purposes only.  
-For the LongLLaMA Code see [codellama/CodeLlama-7b-hf](https://huggingface.co/codellama/CodeLlama-7b-hf/blob/main/LICENSE) license.  
+For the LongLLaMA-Code 7B see [codellama/CodeLlama-7b-hf](https://huggingface.co/codellama/CodeLlama-7b-hf/blob/main/LICENSE) license.  
+LongLLaMA-Code 7B Instruct is LongLLaMA-Code 7B tuned on [TIGER-Lab/MathInstruct](https://huggingface.co/datasets/TIGER-Lab/MathInstruct), [OpenOrca](https://huggingface.co/datasets/Open-Orca/OpenOrca) and [ShareGPT-Processed](https://huggingface.co/datasets/zetavg/ShareGPT-Processed) datasets.  
 Some of the examples use external code (see headers of files for copyright notices and licenses).
 
 ## Acknowledgments
