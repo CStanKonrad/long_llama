@@ -26,7 +26,7 @@
 ### Code
 The model was tuned on a TPU v3-128 pod with 128 batch size.  
 For tuning, we have used the data preparation pipeline available in [instruction_fine_tuning](.).
-However, we have replaced the Hugging Face Trainer with a modification of [FoT continued pretraining code](../fot_continued_pretraining). This modification boils down to propagating the memory cache throughout the model (basically reproducing the Pytorch inference code functionality in JAX).
+However, we have replaced the Hugging Face Trainer with a modification of [FoT continued pretraining code](../fot_continued_pretraining). This modification boils down to propagating the memory cache throughout the model (basically reproducing the Pytorch code functionality in JAX).
 
 ### Training
 Here, we present the basic information about how the model was tuned. For more details, see [misc/LongLLaMA_Code_7B_Instruct_details.py](misc/LongLLaMA_Code_7B_Instruct_details.py).
