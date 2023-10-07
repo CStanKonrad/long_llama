@@ -65,7 +65,7 @@ To denote the user one can write:
 ### Datasets and sampling probability
 * 0.71 - [TIGER-Lab/MathInstruct](https://huggingface.co/datasets/TIGER-Lab/MathInstruct)
 * 0.16, - [Open-Orca/OpenOrca](https://huggingface.co/datasets/Open-Orca/OpenOrca) questions with less than 5k chars
-* 0.08, - [Open-Orca/OpenOrca](https://huggingface.co/datasets/Open-Orca/OpenOrca) questions above 5k chars but below 12k chars
+* 0.10, - [Open-Orca/OpenOrca](https://huggingface.co/datasets/Open-Orca/OpenOrca) questions above 5k chars but below 12k chars
 * 0.02 - [zetavg/ShareGPT-Processed](https://huggingface.co/datasets/zetavg/ShareGPT-Processed) conversations below 6k chars
 * 0.01 - [zetavg/ShareGPT-Processed](https://huggingface.co/datasets/zetavg/ShareGPT-Processed) conversations above 6k chars but below 12k chars
 
