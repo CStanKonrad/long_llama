@@ -72,7 +72,30 @@ To denote the user one can write:
 To improve the quality of the data, the datasets were filtered using regular expressions.  
 
 
-## GSM8K Eval Setup
+## GSM8K Eval
+
+<div align="center">
+
+<table>
+  <tr>
+    <th style="font-size: 120%"> PoT</th>
+    <th style="font-size: 120%"> CoT</th>
+  </tr>
+  <tr>
+    <td align="center">
+    64.5%
+    </td>
+    <td align="center">
+    42.2%
+    </td>
+    
+ </tr>
+</table>
+
+</div>
+
+
+
 For the PoT evaluation, we have used the code from [TIGER-AI-Lab/MAmmoTH](https://github.com/TIGER-AI-Lab/MAmmoTH/tree/main/math_eval).
 As our model was trained with a different prompt, we have added the following code to [prompt_utils.py](https://github.com/TIGER-AI-Lab/MAmmoTH/blob/7f24220b8e6f50aae200096449571a6246571f9f/math_eval/prompt_utils.py)
 ```python3
@@ -118,6 +141,7 @@ The run parameters (after adding the FoT prompt) are as follows:
 --stem_flan_type pot_prompt
 ```
 
+
 For 8-shot CoT, we use the code from [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) and additionally add the `<bos>` token.
 We take the examples from [Chain-of-Thought Prompting Elicits Reasoning
 in Large Language Models](https://browse.arxiv.org/pdf/2201.11903.pdf). 
@@ -150,7 +174,6 @@ A: Olivia had 23 dollars. 5 bagels for 3 dollars each will be 5 x 3 = 15 dollars
 ```
 As the answer we extract the last thing that matches:
 `(?!\,)(?!\.)(\-?[0-9\.\,]+)`
-
 
 ## License
 The instruction/chat-tuned models are for research purposes only.
