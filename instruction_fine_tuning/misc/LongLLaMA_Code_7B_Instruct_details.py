@@ -52,6 +52,5 @@ filtering = "<,>".join(
     "optimizer.adamw_optimizer.lr_warmup_steps": 700,
     "optimizer.adamw_optimizer.lr_decay_steps": 9000,
     "optimizer.adamw_optimizer.weight_decay": 0.0,
-    "local_positionals_in_cross_batch": True,
     "data_filter": filtering,
 }
