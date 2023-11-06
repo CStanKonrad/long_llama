@@ -286,7 +286,7 @@ on [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) 
 
 </div>
 
-Starting with v1.1 models we have decided to use [EleutherAI](https://github.com/EleutherAI) implementation of [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) wit a slight modification, that adds `<bos>` token at beginning of input sequence. The results are provided in the table below.
+Starting with v1.1 models we have decided to use [EleutherAI](https://github.com/EleutherAI) implementation of [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) with a slight modification, that adds `<bos>` token at beginning of input sequence. The results are provided in the table below.
 
 <div align="center">
 
